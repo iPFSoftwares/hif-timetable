@@ -1,13 +1,31 @@
-import { getTimeFromNumber, addMinutesToTime, getTimeFromRow } from './utils';
+import { getTimeFromNumber, addMinutesToTime, getTimeFromRow, getNumberFromTimeArray, numberTimeDiff } from './utils';
 
-test('Formats numbers correctly', () => {
+test('Get time from number', () => {
   expect(getTimeFromNumber(1330)).toBe("13:30");
   expect(getTimeFromNumber(915)).toBe("09:15");
+  expect(getTimeFromNumber(805)).toBe("08:05");
+});
+
+test('Get number from time array', () => {
+  // expect(getNumberFromTimeArray([13,0])).toBe(1300);
+  expect(getNumberFromTimeArray([9,5])).toBe(905);
+  expect(getNumberFromTimeArray([8,0])).toBe(800);
+  expect(getNumberFromTimeArray([12,30])).toBe(1230);
+  expect(getNumberFromTimeArray([14,15])).toBe(1415);
+});
+
+test('Get number time diff', () => {
+  expect(numberTimeDiff(1330, 1300)).toBe(30);
+  expect(numberTimeDiff(1330, 1230)).toBe(60);
+  expect(numberTimeDiff(1505, 1445)).toBe(20);
+  expect(numberTimeDiff(905, 800)).toBe(65);
+  expect(numberTimeDiff(1000, 905)).toBe(55);
 });
 
 test('Add minutes to time', () => {
   expect(addMinutesToTime(1330, 50)).toBe("14:20");
   expect(addMinutesToTime(830, 15)).toBe("08:45");
+  expect(addMinutesToTime(830, 60)).toBe("09:30");
   expect(addMinutesToTime(1615, 70)).toBe("17:25");
 });
 

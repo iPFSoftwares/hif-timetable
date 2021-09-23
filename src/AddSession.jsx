@@ -1,18 +1,111 @@
 import { useEffect, useState } from "react";
-import { addMinutesToTime, getTimeFromNumber } from "./utils";
+import { addMinutesToTime, getNumberFromTimeArray, getTimeFromNumber, numberTimeDiff } from "./utils";
+import SearchEmployees from "./SearchEmployees";
+import SelectActivity from "./SelectActivity";
+import { useMutation } from "react-query";
 
-const hourChoices = [8,9,10,11,12,13,14,15];
+const hourChoices = [8,9,10,11,12,13,14,15,16];
 const minuteChoices = [0, 15, 30, 45];
 
+function EmployeePicker({employee, onChange}){
+    const [value, setValue] = useState(employee);
+    useEffect(() => {
+        if(value && value !== employee)
+            onChange(value);
+    }, [value]);
+
+    return (
+        <>
+            { value && (        
+                <div className="flex items-center px-2 rounded bg-gray-200 bg-opacity-25 border border-gray-300" style={{height: "34px"}}>
+                    <div className="border relative w-6 h-6 rounded-full overflow-hidden">
+                        <img className="absolute w-full h-full object-cover" src={value.dp} alt="" />
+                    </div>
+                    <span className="ml-2 text-sm">{value.full_name}</span>
+
+                    <button className="ml-auto text-blue-900 text-xs p-0" onClick={() => setValue(null)}>
+                        Change
+                    </button>
+                </div>
+            )}
+
+            { !value && <SearchEmployees onChange={setValue} /> }
+        </>
+    );
+}
+
+function ActivityPicker({activity, onChange}){
+    const [value, setValue] = useState(activity);
+    useEffect(() => {
+        if(value && value !== activity)
+            onChange(value);
+    }, [value]);
+
+    return (
+        <>
+            { value && (        
+                <div className="flex items-center px-2 rounded bg-gray-200 bg-opacity-25 border border-gray-300" style={{height: "34px"}}>
+                    <span className="ml-2 text-sm">{value.title}</span>
+
+                    <button className="ml-auto text-blue-900 text-xs p-0" onClick={() => setValue(null)}>
+                        Change
+                    </button>
+                </div>
+            )}
+
+            { !value && <SelectActivity onChange={setValue} /> }
+        </>
+    );
+}
+
 function AddSession({ session, onClose, onSave }) {
+    const duration = session.duration || 60;
     const [employee, setEmployee] = useState(session.employee);
     const [reviewer, setReviewer] = useState(session.employee);
-    const [startTime, setStartTime] = useState(session.startTime.split(":"));
+    const [startTime, setStartTime] = useState(session.startTime.split(":").map(digit => Number(digit)));
     const [endTime, setEndTime] = useState([8,30]);
+    const [description, setDescription] = useState("");
+    const [activity, setActivity] = useState(null);
+
+    const mutation = useMutation((updatedUser) =>
+        fetch('https://walterkimaro.com/api/Session', {
+            method: "POST",
+            body: JSON.stringify(updatedUser),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        }
+        ).then(res =>res.json()),
+        {
+            onSuccess: () => {
+                onSave();
+            },
+        }
+    );
+
+    const { isLoading, isError, error, isSuccess, data } = mutation;
 
     useEffect(() => {
-        setEndTime(addMinutesToTime(Number(session.startTime.replace(":", "")), 60).split(":"));
+        setEndTime(addMinutesToTime(Number(session.startTime.replace(":", "")), duration).split(":").map(digit => Number(digit)));
     }, []);
+
+    function handleSave(){
+        const startTimeNumber = getNumberFromTimeArray(startTime);
+        const endTimeNumber = getNumberFromTimeArray(endTime);
+
+        const data = {
+            time: startTimeNumber,
+            duration: numberTimeDiff(endTimeNumber, startTimeNumber),
+            activity: activity._id,
+            description,
+            owner: employee._id,
+            reviewer: reviewer._id,
+        };
+
+        // onSave(data);
+        console.log("Save session:", data);
+        mutation.mutate(data);
+    }
 
     return (
         <div className="fixed overflow-y-auto inset-0 bg-black bg-opacity-75 z-10 flex items-center justify-center">
@@ -31,19 +124,20 @@ function AddSession({ session, onClose, onSave }) {
                 </div>
 
                 <div className="bg-white py-3 px-4">
-                    <div className="mb-4">
+                    {
+                        isError && <span>Error saving session: {error}</span>
+                    }
+
+                    <div className="mb-3">
                         Employee
 
-                        <div className="flex items-center px-2 rounded bg-gray-400 bg-opacity-25 border border-gray-300" style={{height: "34px"}}>
-                            <div className="border relative w-6 h-6 rounded-full overflow-hidden">
-                                <img className="absolute w-full h-full object-cover" src={employee.dp} alt="" />
-                            </div>
-                            <span className="ml-2 text-sm">{employee.full_name}</span>
+                        <EmployeePicker employee={employee} onChange={setEmployee} />
+                    </div>
 
-                            <button className="ml-auto text-blue-900 text-xs p-0" onClick={onClose}>
-                                Change
-                            </button>
-                        </div>
+                    <div className="mb-4">
+                        Activity
+
+                        <ActivityPicker activity={activity} onChange={setActivity} />
                     </div>
 
                     <div className="mb-4">
@@ -51,19 +145,19 @@ function AddSession({ session, onClose, onSave }) {
                             <div className="flex-1 flex-shrink-0 mr-2">
                                 <label>Start Time</label>
 
-                                <div className="inline-flex items-center px-2 rounded border border-gray-300" style={{height: "34px"}}>
-                                    <select className="" value={startTime[0].toString().padStart(2, '0')} onChange={e => setStartTime([e.target.value, startTime[1]])}>
+                                <div className="inline-flex items-center px-2 rounded bg-gray-100 border border-gray-300" style={{height: "34px"}}>
+                                    <select className="" value={startTime[0]} onChange={e => setStartTime([e.target.value, startTime[1]])}>
                                         {
                                             hourChoices.map(h => (
-                                                <option value={h}>{h.toString().padStart(2, '0')}</option>
+                                                <option key={h} value={h}>{h.toString().padStart(2, '0')}</option>
                                             ))
                                         }
                                     </select>
                                     <span className="mx-3 text-gray-400">|</span>
-                                    <select className="px-" value={startTime[1].toString().padStart(2, '0')} onChange={e => setStartTime([startTime[0], e.target.value])}>
+                                    <select className="px-" value={startTime[1]} onChange={e => setStartTime([startTime[0], e.target.value])}>
                                         {
                                             minuteChoices.map(h => (
-                                                <option value={h}>{h.toString().padStart(2, '0')}</option>
+                                                <option key={h} value={h}>{h.toString().padStart(2, '0')}</option>
                                             ))
                                         }
                                     </select>
@@ -73,45 +167,48 @@ function AddSession({ session, onClose, onSave }) {
                             <div className="flex-1 flex-shrink-0">
                                 <label>End time</label>
 
-                                <div className="inline-flex items-center px-2 rounded border border-gray-300" style={{height: "34px"}}>
-                                    <select className="" value={endTime[0].toString().padStart(2, '0')} onChange={e => setEndTime([e.target.value, endTime[1]])}>
+                                <div className="inline-flex items-center px-2 rounded bg-gray-100 border border-gray-300" style={{height: "34px"}}>
+                                    <select className="" value={endTime[0]} onChange={e => setEndTime([e.target.value, endTime[1]])}>
                                         {
                                             hourChoices.map(h => (
-                                                <option value={h}>{h.toString().padStart(2, '0')}</option>
+                                                <option key={h} value={h}>{h.toString().padStart(2, '0')}</option>
                                             ))
                                         }
                                     </select>
                                     <span className="mx-3 text-gray-400">|</span>
-                                    <select className="px-" value={endTime[1].toString().padStart(2, '0')} onChange={e => setEndTime([endTime[0], e.target.value])}>
+                                    <select className="px-" value={endTime[1]} onChange={e => setEndTime([endTime[0], e.target.value])}>
                                         {
                                             minuteChoices.map(h => (
-                                                <option value={h}>{h.toString().padStart(2, '0')}</option>
+                                                <option key={h} value={h}>{h.toString().padStart(2, '0')}</option>
                                             ))
                                         }
                                     </select>
                                 </div>
                             </div>
+
                         </div>
+                    </div>
+
+                    <div className="mb-2">
+                        <label>Session Details</label>
+
+                        <textarea type="text" className="w-full py-1 px-2 rounded bg-gray-100 border border-gray-300 resize-y" 
+                            value={description}
+                            onChange={e => setDescription(e.target.value)}
+                        ></textarea>
                     </div>
 
                     <div className="mb-4">
                         Reviewer
 
-                        <div className="flex items-center px-2 rounded bg-gray-400 bg-opacity-25 border border-gray-300" style={{height: "34px"}}>
-                            <div className="border relative w-6 h-6 rounded-full overflow-hidden">
-                                <img className="absolute w-full h-full object-cover" src={reviewer.dp} alt="" />
-                            </div>
-                            <span className="ml-2 text-sm">{reviewer.full_name}</span>
-
-                            <button className="ml-auto text-blue-900 text-xs p-0" onClick={onClose}>
-                                Change
-                            </button>
-                        </div>
+                        <EmployeePicker employee={reviewer} onChange={setReviewer} />
                     </div>
 
                     <div className="flex justify-end">
-                        <button className="mt-3 mb-1 text-sm py-1 px-6 rounded-full border border-blue-900 text-blue-900">
-                            Save Session
+                        <button className="mt-3 mb-1 text-sm py-1 px-6 rounded-full border border-blue-900 text-blue-900"
+                            onClick={handleSave}
+                        >
+                            { isLoading ? 'Please Wait...' : 'Save Session' }
                         </button>
                     </div>
                 </div>

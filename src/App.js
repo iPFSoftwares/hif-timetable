@@ -7,7 +7,7 @@ import { getTimeFromNumber, addMinutesToTime, getTimeFromRow } from './utils';
 
 const hours = 8;
 
-function ScheduleGrid({employees, sessions}){
+function ScheduleGrid({employees, sessions, onSessionsUpdated}){
   const [selectedUser, setSelectedUser] = useState(null);
   const [newSession, setNewSession] = useState(null);
 
@@ -18,6 +18,11 @@ function ScheduleGrid({employees, sessions}){
     return sessions.filter(session => {
       return session.owner._id === employeeId || session.reviewer._id === employeeId;
     });
+  }
+
+  function handleOnSaveSession(){
+    setNewSession(null);
+    onSessionsUpdated();
   }
 
   return (
@@ -102,6 +107,7 @@ function ScheduleGrid({employees, sessions}){
             <AddSession 
               session={newSession}
               onClose={_ => setNewSession(null)}
+              onSave={handleOnSaveSession}
             />
           )
         }
@@ -141,7 +147,10 @@ function App() {
         </div>
       </div>
 
-      <ScheduleGrid employees={data} sessions={sessions.data} />
+      <ScheduleGrid 
+        employees={data} sessions={sessions.data} 
+        onSessionsUpdated={() => sessions.refetch() }
+      />
     </div>
   );
 }

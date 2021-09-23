@@ -2,7 +2,24 @@ export const getTimeFromNumber = (number) => {
     var numArray = number.toString().split('');
     var hour = [...numArray].reverse().slice(2).reverse().join('');
     var min = numArray.slice(-2).join('');
-    return `${hour.padStart(2, '0')}:${min}`;
+    return `${hour.padStart(2, '0')}:${min.padStart(2, '0')}`;
+}
+
+export const getNumberFromTimeArray = ([hrs,mins]) => {
+    hrs = hrs.toString().padStart(2, '0');
+    mins = mins.toString().padStart(2, '0');
+    var time = getTimeFromNumber(Number(`${hrs}${mins}`));
+    return Number(time.replace(':', ''));
+}
+
+export const numberTimeDiff = (larger, smaller) => {
+    let [lh, lm] = getTimeFromNumber(larger).split(":");
+    let [sh, sm] = getTimeFromNumber(smaller).split(":");
+
+    var hourDiff = lh-sh;
+    var minDiff = lm-sm;
+
+    return (hourDiff*60) + minDiff;
 }
 
 export const addMinutesToTime = (number, duration) => {
