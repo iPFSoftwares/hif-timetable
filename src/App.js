@@ -1,86 +1,15 @@
 import { useState } from 'react';
 import { useQuery } from 'react-query';
+import AddSession from './AddSession';
 import './App.css';
+import SingleEmployeeSchedule from './SingleEmployeeSchedule';
+import { getTimeFromNumber, addMinutesToTime, getTimeFromRow } from './utils';
 
 const hours = 8;
 
-function antiRound(number){
-  let [num, decimal] = number.toFixed(1).split('.');
-  decimal = Number(decimal);
-  const newNum = Number(num) + (decimal < 5 ? 1 : 0);
-  console.log("\n\nAnti round: ", number, newNum);
-  return newNum;
-}
-
-function SingleEmployeeSchedule({employee, sessions, onClose}){
-  const sortedSessions = sessions.sort((a,b) => a.time - b.time);
-
-  return (
-    <div className="fixed overflow-y-auto inset-0 bg-black bg-opacity-75 z-10 flex items-center justify-center">
-      <div className="fixed inset-0" onClick={onClose}>
-
-      </div>
-      <div className="rounded overflow-hidden w-full max-w-lg bg-white relative z-10">
-        <div className="bg-blue-900 text-white p-3 flex items-center justify-between">
-          <div className="flex items-center ml-1">
-            <div className="border relative w-8 h-8 rounded-full overflow-hidden">
-              <img className="absolute w-full h-full object-cover" src={employee.dp} alt="" />
-            </div>
-            <h3 className="ml-3">{employee.full_name}</h3>
-          </div>
-
-          <button className="p-1" onClick={onClose}>
-            <svg className="w-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg>
-          </button>
-        </div>
-
-        <div className="p-3">
-          {sortedSessions.map((session) => {
-            let selfReview = session.reviewer._id === session.owner._id;
-            let asReviewer = false;
-            if(!selfReview && session.reviewer._id === employee._id)
-              asReviewer = true;
-
-            return (
-              <div className="mb-3">
-                <div className="flex items-start">
-                  <span className="w-24 mr-5 flex-shrink-0 text-blue-900 text-right">
-                    {session.time} - {session.time}
-                  </span>
-
-                  <div className="flex-1">
-                    <h3 className="font-semibold">
-                      { asReviewer && <span><span className="font-normal">Review</span> {session.owner.full_name}</span> }
-                      { !asReviewer && session.activity.title}
-                    </h3>
-                    <p className="text-sm opacity-75">
-                      {session.description}
-                    </p>
-
-                    { !selfReview && !asReviewer && (
-                      <div className="flex items-center mt-1">
-                        <img style={{width: "24px", height: "24px", objectFit: "cover", borderRadius: "50%"}} 
-                          title={'Reviewer: ' + session.reviewer.full_name} src={session.reviewer.dp} alt="" 
-                        />
-
-                        <span className="ml-3">
-                          Reviewer: { session.reviewer.full_name }
-                        </span>
-                      </div>
-                    ) }
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function ScheduleGrid({employees, sessions}){
   const [selectedUser, setSelectedUser] = useState(null);
+  const [newSession, setNewSession] = useState(null);
 
   function getEmployeeSessions(employeeId){
     if(!sessions || !sessions.length)
@@ -106,14 +35,18 @@ function ScheduleGrid({employees, sessions}){
               <div style={{height: "100%",display: 'grid', gap: "1px", gridTemplateColumns: `repeat(${hours * 4}, 1fr)`}}>
                 {
                   Array(hours*4).fill(12).map((_, i) => (
-                    <div key={i} style={{display: 'flex', background: "#ddd", position: 'relative'}}>
+                    <div key={i} style={{display: 'flex', background: "#ddd", position: 'relative'}}
+                      className="cursor-pointer"
+                      // onClick={() => {console.log("Add new session: ", {employee: e, startTime: getTimeFromRow(i+1)});}}
+                      onClick={() => setNewSession({employee: e, startTime: getTimeFromRow(i+1)})}
+                    >
                       {/* <span style={{position: "absolute"}}>{ i + 1 }</span> */}
                     </div>
                   ))
                 }
               </div>
 
-              <div style={{height: "100%", position: "absolute", top: 0, left: 0, right: 0, bottom: 0, background: "rgba(0, 0, 0, 0.01)", display: 'grid', gap: "1px", gridTemplateColumns: `repeat(${hours * 4}, 1fr)`}}>
+              <div className="absolute inset-0 grid pointer-events-none" style={{background: "rgba(0, 0, 0, 0.01)", gap: "1px", gridTemplateColumns: `repeat(${hours * 4}, 1fr)`}}>
                 {
                   getEmployeeSessions(e._id).map((session, index) => {
                     let selfReview = session.reviewer._id === session.owner._id;
@@ -130,11 +63,11 @@ function ScheduleGrid({employees, sessions}){
                     let gridArea = `${rowStart} / ${colStart} / ${rowEnd} / ${colEnd}`;
 
                     return (
-                      <div key={session._id} className="session-card bg-blue-900 text-white" style={{gridArea}}>
-                        <div className="text-xs opacity-50">
-                          { session.time }
+                      <div key={session._id} className="session-card pointer-events-auto cursor-pointer bg-blue-900 text-white" style={{gridArea}}>
+                        <div className="truncate opacity-50" style={{fontSize: "10px"}}>
+                          { getTimeFromNumber(session.time) } - {addMinutesToTime(session.time, session.duration)}
                         </div>
-                        <h3>
+                        <h3 className="mt-0.5">
                           { asReviewer && 
                             <span>Review { session.owner.full_name }</span>
                           }
@@ -161,6 +94,14 @@ function ScheduleGrid({employees, sessions}){
               employee={selectedUser}
               sessions={getEmployeeSessions(selectedUser._id)}
               onClose={_ => setSelectedUser(null)}
+            />
+          )
+        }
+
+        { newSession && (
+            <AddSession 
+              session={newSession}
+              onClose={_ => setNewSession(null)}
             />
           )
         }
