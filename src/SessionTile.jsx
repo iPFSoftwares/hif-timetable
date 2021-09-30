@@ -36,16 +36,18 @@ const SessionTile = ({ session, employee, onEdit, onDelete }) => {
         };
     }, []);
 
-    const deleter = useMutation(() =>
-      fetch('https://walterkimaro.com/api/Session/' + session._id, {
-          method: "DELETE",
-          headers: {
+    const deleter = useMutation(() => fetch('https://walterkimaro.com/api/Session/' + session._id, {
+        method: "DELETE",
+        headers: {
             'Content-Type': 'application/json'
-          }
-      })
-      .then(res =>res.json()), {
-          onSuccess: onDelete,
-      });
+        }
+    })
+    .then(res =>res.json()), {
+        onSuccess: () => {
+            setDeleting(false);
+            onDelete();
+        },
+    });
 
     function shiftReleased(e){
         console.log("Shift release captured");
