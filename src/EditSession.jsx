@@ -6,7 +6,7 @@ import { useMutation } from "react-query";
 import ActivityPicker from "./ActivityPicker";
 import { defaultActivity } from "./constants";
 
-const hourChoices = [8,9,10,11,12,13,14,15,16];
+const hourChoices = [8,9,10,11,12,13,14,15,16, 17];
 const minuteChoices = [0, 15, 30, 45];
 
 function EmployeePicker({employee, onChange}){
