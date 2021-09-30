@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useMutation } from "react-query";
+import { defaultActivity } from "./constants";
 import { addMinutesToTime, getTimeFromNumber } from "./utils";
 
 const SessionTile = ({ session, employee, onEdit, onDelete }) => {
@@ -20,6 +21,10 @@ const SessionTile = ({ session, employee, onEdit, onDelete }) => {
     let gridArea = `${rowStart} / ${colStart} / ${rowEnd} / ${colEnd}`;
 
     const canDelete = mouseOver && shiftSelected;
+
+    let activity = session.activity.title;
+    if(session.activity._id === defaultActivity)
+        activity = session.title;
 
     useEffect(() => {
         window.addEventListener("shift-released", shiftReleased, false);
@@ -76,7 +81,7 @@ const SessionTile = ({ session, employee, onEdit, onDelete }) => {
                     {asReviewer &&
                         <span>Review {session.owner.full_name}</span>
                     }
-                    {!asReviewer && session.activity.title}
+                    {!asReviewer && activity}
                 </h3>
                 {!selfReview && !asReviewer && (
                     <div style={{ marginTop: "0.15rem", display: "flex", alignItems: "center", fontSize: "13px" }}>

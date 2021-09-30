@@ -3,6 +3,8 @@ import { addMinutesToTime, getNumberFromTimeArray, getTimeFromNumber, numberTime
 import SearchEmployees from "./SearchEmployees";
 import SelectActivity from "./SelectActivity";
 import { useMutation } from "react-query";
+import ActivityPicker from "./ActivityPicker";
+import { defaultActivity } from "./constants";
 
 const hourChoices = [8,9,10,11,12,13,14,15,16];
 const minuteChoices = [0, 15, 30, 45];
@@ -34,30 +36,6 @@ function EmployeePicker({employee, onChange}){
     );
 }
 
-function ActivityPicker({activity, onChange}){
-    const [value, setValue] = useState(activity);
-    useEffect(() => {
-        if(value && value !== activity)
-            onChange(value);
-    }, [value]);
-
-    return (
-        <>
-            { value && (        
-                <div className="flex items-center px-2 rounded bg-gray-200 bg-opacity-25 border border-gray-300" style={{height: "34px"}}>
-                    <span className="ml-2 text-sm">{value.title}</span>
-
-                    <button className="ml-auto text-blue-900 text-xs p-0" onClick={() => setValue(null)}>
-                        Change
-                    </button>
-                </div>
-            )}
-
-            { !value && <SelectActivity onChange={setValue} /> }
-        </>
-    );
-}
-
 function EditSession({ session, onClose, onSave }) {
     const duration = session.duration;
     const [employee, setEmployee] = useState(session.owner);
@@ -65,7 +43,8 @@ function EditSession({ session, onClose, onSave }) {
     const [startTime, setStartTime] = useState(getTimeFromNumber(session.time).split(":").map(digit => Number(digit)));
     const [endTime, setEndTime] = useState([8,30]);
     const [description, setDescription] = useState(session.description);
-    const [activity, setActivity] = useState(session.activity);
+    const [activity, setActivity] = useState(session.activity && session.activity._id !== "a535186e-5e34-4bc1-872f-d06d7b604613" ? session.activity : null);
+    const [title, setTitle] = useState(session.title);
 
     const mutation = useMutation((updatedUser) =>
         fetch('https://walterkimaro.com/api/Session/' + session._id, {
@@ -97,7 +76,8 @@ function EditSession({ session, onClose, onSave }) {
         const data = {
             time: startTimeNumber,
             duration: numberTimeDiff(endTimeNumber, startTimeNumber),
-            activity: activity._id,
+            title,
+            activity: activity ? activity._id : defaultActivity,
             description,
             owner: employee._id,
             reviewer: reviewer._id,
@@ -138,7 +118,12 @@ function EditSession({ session, onClose, onSave }) {
                     <div className="mb-4">
                         Activity
 
-                        <ActivityPicker activity={activity} onChange={setActivity} />
+                        <ActivityPicker 
+                            activity={activity}
+                            searchQuery={title}
+                            onSearchQueryChange={setTitle}
+                            onChange={setActivity} 
+                        />
                     </div>
 
                     <div className="mb-4">

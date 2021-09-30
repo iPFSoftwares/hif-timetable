@@ -36,10 +36,11 @@ function fetchCities(value) {
     });
 }
 
-function SelectActivity({placeholder = "Type to search", onChange}) {
-    const [searchTerm, setSearchTerm] = useState("");
+function SelectActivity({placeholder = "Type to search", searchQuery = "", onSearchQueryChange, onChange}) {
+    const [searchTerm, setSearchTerm] = useState(searchQuery);
     const cities = useCitySearch(searchTerm);
     const handleSearchTermChange = (event) => {
+      onSearchQueryChange(event.target.value);
       setSearchTerm(event.target.value);
     };
     const handleSelect = (name) => {
@@ -54,28 +55,33 @@ function SelectActivity({placeholder = "Type to search", onChange}) {
         <ComboboxInput
           className="w-full py-1 px-2 rounded border border-gray-300 focus:outline-none bg-gray-100"
           placeholder={placeholder}
+          value={searchTerm}
           onChange={handleSearchTermChange}
           autoFocus
         />
         {cities && (
           <ComboboxPopover className="rounded overflow-hidden bg-white shadow-lg border z-20">
-            {cities.length > 0 ? (
-              <ComboboxList>
-                {cities.map((activity) => {
-                  return (
-                      <ComboboxOption 
-                        key={activity._id} 
-                        className="px-3 py-2"
-                        value={activity.title} 
-                      />
-                  );
-                })}
-              </ComboboxList>
-            ) : (
-              <span className="block p-3">
-                No results found
-              </span>
-            )}
+            {cities.length > 0 
+              ? (
+                <ComboboxList>
+                  {cities.map((activity) => {
+                    return (
+                        <ComboboxOption 
+                          key={activity._id} 
+                          className="px-3 py-2"
+                          value={activity.title} 
+                        />
+                    );
+                  })}
+                </ComboboxList>
+              )
+              : null
+              // : (
+              //   <span className="block p-3">
+              //     No results found
+              //   </span>
+              // )
+            }
           </ComboboxPopover>
         )}
       </Combobox>

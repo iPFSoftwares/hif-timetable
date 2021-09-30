@@ -10,6 +10,11 @@ body, html{
   background-color: transparent;
 }
 
+input::selection,
+textarea::selection{
+  background-color: #c5d7ff;
+}
+
 .session-card{
   /* background: red; */
   padding: 0.15rem 0.25rem;
