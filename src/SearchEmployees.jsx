@@ -9,25 +9,28 @@ import { useEffect, useState } from "react";
 
 function useCitySearch(searchTerm) {
   const [cities, setCities] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (searchTerm.trim() !== "") {
       let isFresh = true;
+      setLoading(true);
       fetchCities(searchTerm).then((cities) => {
+        setLoading(false);
         if (isFresh) setCities(cities);
       });
       return () => (isFresh = false);
     }
   }, [searchTerm]);
 
-  return cities;
+  return [cities, loading];
 }
 
 const cache = {};
 function fetchCities(value) {
-  if (cache[value]) {
+  if (cache[value])
     return Promise.resolve(cache[value]);
-  }
+    
   return fetch("https://walterkimaro.com/api/Employee/search?q=" + value)
     .then((res) => res.json())
     .then((result) => {
@@ -38,7 +41,7 @@ function fetchCities(value) {
 
 function SearchEmployees({placeholder = "Type to search", onChange}) {
     const [searchTerm, setSearchTerm] = useState("");
-    const cities = useCitySearch(searchTerm);
+    const [cities, loading] = useCitySearch(searchTerm);
     const handleSearchTermChange = (event) => {
       setSearchTerm(event.target.value);
     };
@@ -59,7 +62,7 @@ function SearchEmployees({placeholder = "Type to search", onChange}) {
         />
         {cities && (
           <ComboboxPopover className="rounded overflow-hidden bg-white shadow-lg border z-20">
-            {cities.length > 0 ? (
+            {(!loading && cities.length) > 0 ? (
               <ComboboxList>
                 {cities.map((employee) => {
                   return (
@@ -76,7 +79,7 @@ function SearchEmployees({placeholder = "Type to search", onChange}) {
               </ComboboxList>
             ) : (
               <span className="block p-3">
-                No results found
+                { loading ? 'Loading...' : 'No results found' }
               </span>
             )}
           </ComboboxPopover>

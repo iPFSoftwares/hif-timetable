@@ -10,19 +10,22 @@ import {
 } from "@reach/combobox";
 
 function useCitySearch(searchTerm) {
-  const [cities, setCities] = useState([]);
-
-  useEffect(() => {
-    if (searchTerm.trim() !== "") {
-      let isFresh = true;
-      fetchCities(searchTerm).then((cities) => {
-        if (isFresh) setCities(cities);
-      });
-      return () => (isFresh = false);
-    }
-  }, [searchTerm]);
-
-  return cities;
+    const [cities, setCities] = useState([]);
+    const [loading, setLoading] = useState(false);
+  
+    useEffect(() => {
+      if (searchTerm.trim() !== "") {
+        let isFresh = true;
+        setLoading(true);
+        fetchCities(searchTerm).then((cities) => {
+          setLoading(false);
+          if (isFresh) setCities(cities);
+        });
+        return () => (isFresh = false);
+      }
+    }, [searchTerm]);
+  
+    return [cities, loading];
 }
 
 const cache = {};
@@ -40,7 +43,7 @@ function fetchCities(value) {
 
 function SpotlightSearch({placeholder = "Search Employee", onClose, onSelectUser}) {
     const [searchTerm, setSearchTerm] = useState("");
-    const cities = useCitySearch(searchTerm);
+    const [cities, loading] = useCitySearch(searchTerm);
     const inputRef = useRef(null);
 
     useEffect(() => {
@@ -106,7 +109,7 @@ function SpotlightSearch({placeholder = "Search Employee", onClose, onSelectUser
                                 </ComboboxList>
                                 ) : (
                                 <span className="block p-3">
-                                    No results found
+                                    { loading ? 'Loading...' : 'No results found' }
                                 </span>
                                 )}
                             </ComboboxPopover>

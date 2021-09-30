@@ -9,18 +9,21 @@ import { useEffect, useState } from "react";
 
 function useCitySearch(searchTerm) {
   const [cities, setCities] = useState([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (searchTerm.trim() !== "") {
       let isFresh = true;
+      setLoading(true);
       fetchCities(searchTerm).then((cities) => {
+        setLoading(false);
         if (isFresh) setCities(cities);
       });
       return () => (isFresh = false);
     }
   }, [searchTerm]);
 
-  return cities;
+  return [cities, loading];
 }
 
 const cache = {};
@@ -38,7 +41,7 @@ function fetchCities(value) {
 
 function SelectActivity({placeholder = "Type to search", searchQuery = "", onSearchQueryChange, onChange}) {
     const [searchTerm, setSearchTerm] = useState(searchQuery);
-    const cities = useCitySearch(searchTerm);
+    const [cities, loading] = useCitySearch(searchTerm);
     const handleSearchTermChange = (event) => {
       onSearchQueryChange(event.target.value);
       setSearchTerm(event.target.value);
@@ -75,12 +78,11 @@ function SelectActivity({placeholder = "Type to search", searchQuery = "", onSea
                   })}
                 </ComboboxList>
               )
-              : null
-              // : (
-              //   <span className="block p-3">
-              //     No results found
-              //   </span>
-              // )
+              : !loading ? null : (
+                <span className="block p-3">
+                  Loading...
+                </span>
+              )
             }
           </ComboboxPopover>
         )}

@@ -1,14 +1,18 @@
+import { defaultActivity } from "./constants";
 import { addMinutesToTime, getTimeFromNumber } from "./utils";
 
 function SingleEmployeeSchedule({ employee, sessions, onClose }) {
     const sortedSessions = sessions.sort((a, b) => a.time - b.time);
+    const dialogHeight = Math.min(750, window.innerHeight * 0.85);
 
     return (
-        <div className="fixed overflow-y-auto inset-0 bg-black bg-opacity-75 z-10 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black bg-opacity-75 z-10 flex items-center justify-center">
             <div className="fixed inset-0" onClick={onClose}>
 
             </div>
-            <div className="rounded-lg overflow-hidden w-full max-w-lg relative z-10">
+            <div className="rounded-lg overflow-y-auto w-full max-w-lg relative z-10"
+                style={{maxHeight: dialogHeight}}
+            >
                 <div className="bg-blue-900 text-white py-3 px-4 flex items-center justify-between">
                     <div className="flex items-center">
                         <div className="border relative w-8 h-8 rounded-full overflow-hidden">
@@ -28,6 +32,10 @@ function SingleEmployeeSchedule({ employee, sessions, onClose }) {
                         let asReviewer = false;
                         if (!selfReview && session.reviewer._id === employee._id)
                             asReviewer = true;
+                        
+                        let activity = session.activity.title;
+                        if(session.activity._id === defaultActivity)
+                            activity = session.title;
 
                         return (
                             <div key={session._id} className="mb-3">
@@ -39,7 +47,7 @@ function SingleEmployeeSchedule({ employee, sessions, onClose }) {
                                     <div className="flex-1">
                                         <h3 className="font-semibold">
                                             {asReviewer && <span><span className="font-normal">Review</span> {session.owner.full_name}</span>}
-                                            {!asReviewer && session.activity.title}
+                                            {!asReviewer && activity}
                                         </h3>
                                         <p className="text-sm opacity-75">
                                             {session.description}

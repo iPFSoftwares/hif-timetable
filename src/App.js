@@ -8,7 +8,7 @@ import SingleEmployeeSchedule from './SingleEmployeeSchedule';
 import SpotlightSearch from './SpotlightSearch';
 import { getTimeFromRow } from './utils';
 
-const hours = 8;
+const hours = 10;
 
 function ScheduleGrid({employees, sessions, onSessionsUpdated}){
   const [selectedUser, setSelectedUser] = useState(null);
