@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation } from "react-query";
-import { useEffect } from "react/cjs/react.development";
 import { addMinutesToTime, getTimeFromNumber } from "./utils";
 
 const SessionTile = ({ session, employee, onEdit, onDelete }) => {
@@ -21,6 +20,16 @@ const SessionTile = ({ session, employee, onEdit, onDelete }) => {
     let gridArea = `${rowStart} / ${colStart} / ${rowEnd} / ${colEnd}`;
 
     const canDelete = mouseOver && shiftSelected;
+
+    useEffect(() => {
+        window.addEventListener("shift-released", shiftReleased, false);
+        window.addEventListener("shift-selected", onShiftSelected, false);
+        return () => {
+            console.log("Listener removed from tile");
+            window.removeEventListener("shift-released", shiftReleased, false);
+            window.removeEventListener("shift-selected", onShiftSelected, false);
+        };
+    }, []);
 
     const deleter = useMutation(() =>
       fetch('https://walterkimaro.com/api/Session/' + session._id, {
@@ -47,16 +56,6 @@ const SessionTile = ({ session, employee, onEdit, onDelete }) => {
         setDeleting(true);
         deleter.mutate();
     }
-
-    useEffect(() => {
-        window.addEventListener("shift-released", shiftReleased, false);
-        window.addEventListener("shift-selected", onShiftSelected, false);
-        return () => {
-            console.log("Listener removed from tile");
-            window.removeEventListener("shift-released", shiftReleased, false);
-            window.removeEventListener("shift-selected", onShiftSelected, false);
-        };
-    }, []);
 
     return (
         <div className={`session-card pointer-events-auto cursor-pointer bg-blue-900 text-white relative ${deleting && 'animate-pulse'}`} style={{ gridArea }}

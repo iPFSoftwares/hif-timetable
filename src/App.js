@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
-import { useMutation, useQuery } from 'react-query';
+import { useQuery } from 'react-query';
 import AddSession from './AddSession';
 import './App.css';
 import EditSession from './EditSession';
 import SessionTile from './SessionTile';
 import SingleEmployeeSchedule from './SingleEmployeeSchedule';
-import { getTimeFromNumber, addMinutesToTime, getTimeFromRow } from './utils';
+import SpotlightSearch from './SpotlightSearch';
+import { getTimeFromRow } from './utils';
 
 const hours = 8;
 
@@ -13,6 +14,7 @@ function ScheduleGrid({employees, sessions, onSessionsUpdated}){
   const [selectedUser, setSelectedUser] = useState(null);
   const [newSession, setNewSession] = useState(null);
   const [sessionBeingEdited, setSessionBeingEdited] = useState(null);
+  const [spotlightSearch, setSpotlightSearch] = useState(false);
   
   useEffect(() => {
     document.addEventListener("keyup", onShiftUp, false);
@@ -27,6 +29,19 @@ function ScheduleGrid({employees, sessions, onSessionsUpdated}){
     if(e.key === "Shift"){
       const userPermissionsInitEvent = new CustomEvent('shift-released');
       window.dispatchEvent(userPermissionsInitEvent);
+    }
+
+    else if(!newSession && !sessionBeingEdited){
+      if(e.key === "/")
+          setSpotlightSearch(true);
+      else if(e.key === "Escape"){
+        if(selectedUser && selectedUser.fromSpotlight){
+          setSpotlightSearch(true);
+          setTimeout(() => setSelectedUser(null), 20);
+        }
+        else
+          setSelectedUser(null);
+      }
     }
   }
 
@@ -96,7 +111,7 @@ function ScheduleGrid({employees, sessions, onSessionsUpdated}){
             </div>
           </div>
         ))}
-        
+
         { selectedUser && (
             <SingleEmployeeSchedule 
               employee={selectedUser}
@@ -120,6 +135,14 @@ function ScheduleGrid({employees, sessions, onSessionsUpdated}){
               session={sessionBeingEdited}
               onClose={_ => setSessionBeingEdited(null)}
               onSave={handleOnSaveSession}
+            />
+          )
+        }
+        
+        { spotlightSearch && (
+            <SpotlightSearch 
+              onSelectUser={user => {setSpotlightSearch(false); setSelectedUser(user)}}
+              onClose={_ => setSpotlightSearch(false)}
             />
           )
         }
@@ -160,7 +183,8 @@ function App() {
       </div>
 
       <ScheduleGrid 
-        employees={data} sessions={sessions.data} 
+        employees={data.sort((a, b) => a.tin_number - b.tin_number)}
+        sessions={sessions.data} 
         onSessionsUpdated={() => sessions.refetch() }
       />
     </div>
