@@ -39,3 +39,29 @@ export const getTimeFromRow = (row) => {
     var [hours, mins] = getTimeFromNumber(rowValue).split(":");
     return `${hours.padStart(2, '0')}:${mins}`;
 }
+
+export function formatLink(content){
+    const exp_match = /(\b(https?|):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+    const element_content=content.replace(exp_match, `<a class="text-blue-900" target="_blank" href='$1'>$1</a>`);
+    const new_exp_match =/(^|[^\/])(www\.[\S]+(\b|$))/gim;
+    return element_content.replace(new_exp_match, '$1<a target="_blank" href="http://$2">$2</a>');
+}
+
+export async function confirmPassword(){
+    return new Promise((res, rej) => {
+        const passwordSet = window.localStorage.getItem("PASSWORD_SET");
+        if(passwordSet)
+            res(true);
+        else{
+            window.showConfirmDialog("HIF-2021", {
+                onOkay: () => {
+                    window.localStorage.setItem("PASSWORD_SET", true);
+                    res();
+                },
+                onCancel: () => {
+                    rej();
+                },
+            });
+        }
+    });
+}

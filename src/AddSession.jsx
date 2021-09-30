@@ -5,7 +5,7 @@ import SearchEmployees from "./SearchEmployees";
 import ActivityPicker from "./ActivityPicker";
 import { useMutation } from "react-query";
 
-const hourChoices = [8,9,10,11,12,13,14,15,16, 17];
+const hourChoices = [8,9,10,11,12,13,14,15,16, 17,18];
 const minuteChoices = [0, 15, 30, 45];
 
 function EmployeePicker({employee, onChange}){
@@ -92,12 +92,14 @@ function AddSession({ session, onClose, onSave }) {
 
             </div>
             <div className="rounded-md overflow-hidden w-full max-w-sm relative z-10">
-                <div className="bg-blue-900 text-white py-3 px-4 flex items-center justify-between">
-                    <h3 className="font-semibold">
+                <div className="relative text-white py-3 px-4 flex items-center justify-between">
+                    <div className="absolute inset-0 bg-blue-900s bg-primary opacity-70"></div>
+                    
+                    <h3 className="font-semibold relative z-10">
                         Add Session
                     </h3>
 
-                    <button className="p-1 hover:bg-white hover:bg-opacity-25 rounded-full" onClick={onClose}>
+                    <button className="relative z-10 p-1 hover:bg-white hover:bg-opacity-25 rounded-full" onClick={onClose}>
                         <svg className="w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z" /></svg>
                     </button>
                 </div>

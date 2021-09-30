@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useMutation } from "react-query";
 import { defaultActivity } from "./constants";
-import { addMinutesToTime, getTimeFromNumber } from "./utils";
+import { addMinutesToTime, confirmPassword, getTimeFromNumber } from "./utils";
 
-const SessionTile = ({ session, employee, onEdit, onDelete }) => {
+const SessionTile = ({ session, employee, forAll = false, onEdit, onDelete }) => {
     const [mouseOver, setMouseOver] = useState(false);
     const [shiftSelected, setShiftSelected] = useState(false);
     const [deleting, setDeleting] = useState(false);
@@ -25,6 +25,8 @@ const SessionTile = ({ session, employee, onEdit, onDelete }) => {
     let activity = session.activity.title;
     if(session.activity._id === defaultActivity)
         activity = session.title;
+
+    const onLeave = activity == "Leave";
 
     useEffect(() => {
         window.addEventListener("shift-released", shiftReleased, false);
@@ -59,40 +61,65 @@ const SessionTile = ({ session, employee, onEdit, onDelete }) => {
         setShiftSelected(true);
     }
 
-    function handleDeleteSession(){
-        setDeleting(true);
-        deleter.mutate();
+    async function handleDeleteSession(){
+        try {
+            await confirmPassword();
+            setDeleting(true);
+            deleter.mutate();
+        } catch (error) {
+        
+        }
+    }
+
+    async function handleEditSession(){
+        try {
+            await confirmPassword();
+            onEdit(session);
+        } catch (error) {
+        
+        }
     }
 
     return (
-        <div className={`session-card pointer-events-auto cursor-pointer bg-blue-900 text-white relative ${deleting && 'animate-pulse'}`} style={{ gridArea }}
+        <div className={`session-card pointer-events-auto cursor-pointer ${forAll && 'for-all'} bg-primary text-white relative ${onLeave && 'on-leave'} ${deleting && 'animate-pulse'}`} style={{ gridArea }}
             onMouseOver={(e) => setMouseOver(true)}
             onMouseLeave={_ => setMouseOver(false)}
-            onClick={_ => canDelete ? handleDeleteSession() : onEdit(session)}
+            onClick={_ => canDelete ? handleDeleteSession() : handleEditSession()}
         >
             {(canDelete || deleting) &&
                 <div className="z-10 bg-red-500 absolute inset-0 flex items-center px-2 text-xs">
                     { deleting ? 'Removing Session...' : 'Remove Session' }
                 </div>
             }
-            <div>
-                <div className="truncate opacity-50" style={{ fontSize: "10px" }}>
-                    {getTimeFromNumber(session.time)} - {addMinutesToTime(session.time, session.duration)}
-                </div>
-                <h3 className="mt-0.5">
-                    {asReviewer &&
-                        <span>Review {session.owner.full_name}</span>
-                    }
-                    {!asReviewer && activity}
-                </h3>
-                {!selfReview && !asReviewer && (
-                    <div style={{ marginTop: "0.15rem", display: "flex", alignItems: "center", fontSize: "13px" }}>
-                        <img style={{ width: "20px", height: "20px", objectFit: "cover", borderRadius: "50%" }}
-                            title={'Reviewer: ' + session.reviewer.full_name} src={session.reviewer.dp} alt=""
-                        />
+
+            { !forAll && !onLeave && (
+                <div>
+                    <div className="truncate opacity-80" style={{ fontSize: "10px" }}>
+                        {getTimeFromNumber(session.time)} - {addMinutesToTime(session.time, session.duration)}
                     </div>
-                )}
-            </div>
+                    <h3 className="mt-0.5">
+                        {asReviewer &&
+                            <span>Review {session.owner.full_name}</span>
+                        }
+                        {!asReviewer && activity}
+                    </h3>
+                    {!selfReview && !asReviewer && (
+                        <div style={{ marginTop: "0.15rem", display: "flex", alignItems: "center", fontSize: "13px" }}>
+                            <img style={{ width: "20px", height: "20px", objectFit: "cover", borderRadius: "50%" }}
+                                title={'Reviewer: ' + session.reviewer.full_name} src={session.reviewer.dp} alt=""
+                            />
+                        </div>
+                    )}
+                </div>
+            )}
+
+            { forAll && (
+                <div className="flex items-center justify-center h-full uppercase font-bold text-lg">
+                    <span className="opacity-20"
+                        dangerouslySetInnerHTML={{__html: activity.split('').join('</br>') }}
+                    ></span>
+                </div>
+            )}
         </div>
     );
 }

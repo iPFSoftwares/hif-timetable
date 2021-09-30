@@ -10,13 +10,43 @@ body, html{
   background-color: transparent;
 }
 
+.bg-primary{
+  background: #a9c9f0;
+  color: black;
+}
+
+.session-card.on-leave{
+  position: relative;
+}
+
+.session-card.on-leave:after{
+  content: "ON LEAVE";
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(255, 217, 184, 0.85);
+  color: #975d2d;
+  word-spacing: 0.3rem;
+  isolation: isolate;
+  z-index: 3;
+}
+
 input::selection,
 textarea::selection{
   background-color: #c5d7ff;
 }
 
+.session-card.for-all{
+  background: #d1d5da;
+}
+
 .session-card{
-  /* background: red; */
   padding: 0.15rem 0.25rem;
   border-radius: 3px;
   overflow: hidden;

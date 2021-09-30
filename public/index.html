@@ -15,6 +15,7 @@
       manifest.json provides metadata used when your web app is installed on a
       user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
     -->
+    <link rel="stylesheet" href="%PUBLIC_URL%/modal.css" />
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <!--
       Notice the use of %PUBLIC_URL% in the tags above.
@@ -30,6 +31,95 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+
+    <div id="confirmDialog" class="modal micromodal-slide" aria-hidden="true">
+      <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+          <form style="width: 400px" class="modal__container p-6 relative overflow-visible flex flex-col" role="dialog" aria-modal="true" aria-labelledby="modal-1-title">
+              <div id="confirmDialogText">
+                  <h3 class="text-lg leading-normal mb-3">
+                    Enter password to manage timetable
+                  </h3>
+                  <input class="w-full px-3 py-2 border border-gray-300 rounded" type="text" placeholder="Enter password here" />
+              </div>
+
+              <div class="mt-5 w-full flex items-center justify-end">
+                  <button id="cancelButton" type="button" class="focus:outline-none px-4 py-1 border-2 border-blue-900 uppercase text-xs tracking-wide font-semibold bg-transparent text-blue-900 rounded-full"
+                    data-micromodal-trigger="confirmDialog"
+                      onclick="hideConfirmDialog()"
+                  >
+                      Cancel
+                  </button>
+                  <button type="submit" class="focus:outline-none px-5 py-1 ml-3 border-2 border-blue-900 uppercase text-xs tracking-wide font-semibold bg-blue-900 text-white rounded-full">
+                      Submit
+                  </button>
+              </div>
+            </form>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/micromodal/dist/micromodal.min.js"></script>
+    <script>
+      const errorModalText = document.querySelector("#errorModalText");
+      const confirmDialogText = document.querySelector("#confirmDialog input");
+      const confirmDialogForm = document.querySelector("#confirmDialog form");
+      const confirmDialogCancelButton = document.querySelector("#confirmDialog #cancelButton");
+
+      window.addEventListener("load", function(){
+          MicroModal.init({
+              closeTrigger: 'data-custom-close',
+              openClass: 'is-open',
+              disableScroll: true,
+              disableFocus: false,
+              awaitOpenAnimation: false,
+              awaitCloseAnimation: false,
+              debugMode: true
+          });
+
+          setTimeout(() => {
+              //showsuccessMessage(`You've rejected the suggested edit to <span class="font-semibold" x-text="suggestion.stakeholder.name"></span>'s details'.`);
+          });
+      });
+
+      const defaultConfirmOptions = {
+        message: "Are you absolutely sure you wanna do such a crazy thing?", 
+        okayText: "Yes I'm Sure",
+        onOkay: null,
+        cancelText: "No, Cancel",
+        onCancel: null,
+      };
+
+      window.showConfirmDialog = function(password, options){
+        const mergedOptions = { ...defaultConfirmOptions, ...options };
+        const {
+            message, okayText, onOkay, 
+            onCancel, cancelText
+        } = mergedOptions;
+
+        MicroModal.show('confirmDialog');
+
+        confirmDialogCancelButton.addEventListener('click', () => {
+          confirmDialogText.value = "";
+          hideConfirmDialog();
+          if(onCancel) onCancel();
+        });
+
+        confirmDialogForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          if(confirmDialogText.value != password){
+            alert("Incorrect password");
+            return;
+          }
+
+          confirmDialogText.value = "";
+          hideConfirmDialog();
+          if(onOkay) onOkay();
+        });
+      }
+      
+      function hideConfirmDialog(){
+        MicroModal.close('confirmDialog');
+      }
+    </script>
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.
