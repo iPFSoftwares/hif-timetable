@@ -1,7 +1,9 @@
-import { useState } from 'react';
-import { useQuery } from 'react-query';
+import { useEffect, useState } from 'react';
+import { useMutation, useQuery } from 'react-query';
 import AddSession from './AddSession';
 import './App.css';
+import EditSession from './EditSession';
+import SessionTile from './SessionTile';
 import SingleEmployeeSchedule from './SingleEmployeeSchedule';
 import { getTimeFromNumber, addMinutesToTime, getTimeFromRow } from './utils';
 
@@ -10,6 +12,30 @@ const hours = 8;
 function ScheduleGrid({employees, sessions, onSessionsUpdated}){
   const [selectedUser, setSelectedUser] = useState(null);
   const [newSession, setNewSession] = useState(null);
+  const [sessionBeingEdited, setSessionBeingEdited] = useState(null);
+  
+  useEffect(() => {
+    document.addEventListener("keyup", onShiftUp, false);
+    document.addEventListener("keydown", onShiftDown, false);
+    return () => {
+        document.removeEventListener("keydown", onShiftDown, false);
+        document.removeEventListener("keyup", onShiftUp, false);
+    };
+  }, []);
+
+  function onShiftUp(e){
+    if(e.key === "Shift"){
+      const userPermissionsInitEvent = new CustomEvent('shift-released');
+      window.dispatchEvent(userPermissionsInitEvent);
+    }
+  }
+
+  function onShiftDown(e){
+    if(e.key === "Shift"){
+      const userPermissionsInitEvent = new CustomEvent('shift-selected');
+      window.dispatchEvent(userPermissionsInitEvent);
+    }
+  }
 
   function getEmployeeSessions(employeeId){
     if(!sessions || !sessions.length)
@@ -22,6 +48,7 @@ function ScheduleGrid({employees, sessions, onSessionsUpdated}){
 
   function handleOnSaveSession(){
     setNewSession(null);
+    setSessionBeingEdited(null);
     onSessionsUpdated();
   }
 
@@ -54,38 +81,14 @@ function ScheduleGrid({employees, sessions, onSessionsUpdated}){
               <div className="absolute inset-0 grid pointer-events-none" style={{background: "rgba(0, 0, 0, 0.01)", gap: "1px", gridTemplateColumns: `repeat(${hours * 4}, 1fr)`}}>
                 {
                   getEmployeeSessions(e._id).map((session, index) => {
-                    let selfReview = session.reviewer._id === session.owner._id;
-                    let asReviewer = false;
-                    if(!selfReview && session.reviewer._id === e._id)
-                      asReviewer = true;
-
-                    let rowStart = 1, rowEnd = 1;
-                    let timeDiff = Math.round((session.time - 800) / 100) * 100;
-                    let colStart = (timeDiff / 25) + 1;
-                    colStart += ((session.time - 800) % 100) / 15;
-                    let colEnd = colStart + (session.duration / 15);
-                    // let colEnd = colStart + 2;
-                    let gridArea = `${rowStart} / ${colStart} / ${rowEnd} / ${colEnd}`;
-
                     return (
-                      <div key={session._id} className="session-card pointer-events-auto cursor-pointer bg-blue-900 text-white" style={{gridArea}}>
-                        <div className="truncate opacity-50" style={{fontSize: "10px"}}>
-                          { getTimeFromNumber(session.time) } - {addMinutesToTime(session.time, session.duration)}
-                        </div>
-                        <h3 className="mt-0.5">
-                          { asReviewer && 
-                            <span>Review { session.owner.full_name }</span>
-                          }
-                          { !asReviewer && session.activity.title }
-                        </h3>
-                        { !selfReview && !asReviewer && (
-                          <div style={{marginTop: "0.15rem", display: "flex", alignItems: "center", fontSize: "13px"}}>
-                            <img style={{width: "20px", height: "20px", objectFit: "cover", borderRadius: "50%"}} 
-                              title={'Reviewer: ' + session.reviewer.full_name} src={session.reviewer.dp} alt="" 
-                            />
-                          </div>
-                        ) }
-                      </div>
+                      <SessionTile 
+                        key={index} 
+                        employee={e} 
+                        session={session} 
+                        onEdit={setSessionBeingEdited}
+                        onDelete={handleOnSaveSession}
+                      />
                     );
                   })
                 }
@@ -107,6 +110,15 @@ function ScheduleGrid({employees, sessions, onSessionsUpdated}){
             <AddSession 
               session={newSession}
               onClose={_ => setNewSession(null)}
+              onSave={handleOnSaveSession}
+            />
+          )
+        }
+
+        { sessionBeingEdited && (
+            <EditSession 
+              session={sessionBeingEdited}
+              onClose={_ => setSessionBeingEdited(null)}
               onSave={handleOnSaveSession}
             />
           )
