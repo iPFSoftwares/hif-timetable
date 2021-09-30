@@ -14,7 +14,7 @@ function ActivityPicker({activity, searchQuery, onSearchQueryChange = () => {}, 
                 <div className="flex items-center px-2 rounded bg-gray-200 bg-opacity-25 border border-gray-300" style={{height: "34px"}}>
                     <span className="ml-2 text-sm">{value.title}</span>
 
-                    <button className="ml-auto text-blue-900 text-xs p-0" onClick={() => setValue(null)}>
+                    <button className="ml-auto text-blue-900 text-xs p-0" onClick={() => {setValue(null); onChange(null)}}>
                         Change
                     </button>
                 </div>
