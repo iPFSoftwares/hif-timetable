@@ -72,5 +72,5 @@ export function getEmployeeSessions(sessions, employeeId){
 
     return sessions.filter(session => {
       return session.owner._id === employeeId || session.reviewer._id === employeeId;
-    });
+    }).sort((a, b) => a.time - b.time);
 }
