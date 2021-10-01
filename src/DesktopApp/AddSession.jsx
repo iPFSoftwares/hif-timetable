@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
-import { addMinutesToTime, getNumberFromTimeArray, getTimeFromNumber, numberTimeDiff } from "./utils";
+import { addMinutesToTime, getNumberFromTimeArray, getTimeFromNumber, numberTimeDiff } from "../utils";
+import { defaultActivity, BASE_URL } from "../constants";
 import SearchEmployees from "./SearchEmployees";
-import SelectActivity from "./SelectActivity";
-import { useMutation } from "react-query";
 import ActivityPicker from "./ActivityPicker";
-import { defaultActivity } from "./constants";
+import { useMutation } from "react-query";
 
 const hourChoices = [8,9,10,11,12,13,14,15,16, 17,18];
 const minuteChoices = [0, 15, 30, 45];
@@ -36,19 +35,19 @@ function EmployeePicker({employee, onChange}){
     );
 }
 
-function EditSession({ session, onClose, onSave }) {
-    const duration = session.duration;
-    const [employee, setEmployee] = useState(session.owner);
-    const [reviewer, setReviewer] = useState(session.reviewer);
-    const [startTime, setStartTime] = useState(getTimeFromNumber(session.time).split(":").map(digit => Number(digit)));
+function AddSession({ session, onClose, onSave }) {
+    const duration = session.duration || 60;
+    const [employee, setEmployee] = useState(session.employee);
+    const [reviewer, setReviewer] = useState(session.employee);
+    const [startTime, setStartTime] = useState(session.startTime.split(":").map(digit => Number(digit)));
     const [endTime, setEndTime] = useState([8,30]);
-    const [description, setDescription] = useState(session.description);
-    const [activity, setActivity] = useState(session.activity && session.activity._id !== "a535186e-5e34-4bc1-872f-d06d7b604613" ? session.activity : null);
-    const [title, setTitle] = useState(session.title);
+    const [description, setDescription] = useState("");
+    const [activity, setActivity] = useState(null);
+    const [title, setTitle] = useState("");
 
     const mutation = useMutation((updatedUser) =>
-        fetch('https://walterkimaro.com/api/Session/' + session._id, {
-            method: "PATCH",
+        fetch(`${BASE_URL }/Session`, {
+            method: "POST",
             body: JSON.stringify(updatedUser),
             headers: {
                 'Content-Type': 'application/json'
@@ -65,8 +64,7 @@ function EditSession({ session, onClose, onSave }) {
     const { isLoading, isError, error, isSuccess, data } = mutation;
 
     useEffect(() => {
-        const startTime = getTimeFromNumber(session.time).replace(":", "");
-        setEndTime(addMinutesToTime(Number(startTime), duration).split(":").map(digit => Number(digit)));
+        setEndTime(addMinutesToTime(Number(session.startTime.replace(":", "")), duration).split(":").map(digit => Number(digit)));
     }, []);
 
     function handleSave(){
@@ -98,7 +96,7 @@ function EditSession({ session, onClose, onSave }) {
                     <div className="absolute inset-0 bg-blue-900s bg-primary opacity-70"></div>
                     
                     <h3 className="font-semibold relative z-10">
-                        Edit Session
+                        Add Session
                     </h3>
 
                     <button className="relative z-10 p-1 hover:bg-white hover:bg-opacity-25 rounded-full" onClick={onClose}>
@@ -122,7 +120,6 @@ function EditSession({ session, onClose, onSave }) {
 
                         <ActivityPicker 
                             activity={activity}
-                            searchQuery={title}
                             onSearchQueryChange={setTitle}
                             onChange={setActivity} 
                         />
@@ -205,4 +202,4 @@ function EditSession({ session, onClose, onSave }) {
     );
 }
 
-export default EditSession;
+export default AddSession;

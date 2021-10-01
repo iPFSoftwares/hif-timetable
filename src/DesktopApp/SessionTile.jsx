@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useMutation } from "react-query";
-import { defaultActivity } from "./constants";
-import { addMinutesToTime, confirmPassword, getTimeFromNumber } from "./utils";
+import { defaultActivity, BASE_URL } from "../constants";
+import { addMinutesToTime, confirmPassword, getTimeFromNumber } from "../utils";
 
 const SessionTile = ({ session, employee, forAll = false, onEdit, onDelete }) => {
     const [mouseOver, setMouseOver] = useState(false);
@@ -38,7 +38,7 @@ const SessionTile = ({ session, employee, forAll = false, onEdit, onDelete }) =>
         };
     }, []);
 
-    const deleter = useMutation(() => fetch('https://walterkimaro.com/api/Session/' + session._id, {
+    const deleter = useMutation(() => fetch(`${BASE_URL}/Session/${session._id}`, {
         method: "DELETE",
         headers: {
             'Content-Type': 'application/json'

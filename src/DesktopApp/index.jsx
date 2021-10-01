@@ -6,7 +6,8 @@ import EditSession from './EditSession';
 import SessionTile from './SessionTile';
 import SingleEmployeeSchedule from './SingleEmployeeSchedule';
 import SpotlightSearch from './SpotlightSearch';
-import { confirmPassword, getTimeFromRow } from './utils';
+import { confirmPassword, getEmployeeSessions, getTimeFromRow } from '../utils';
+import { BASE_URL } from '../constants';
 
 const hours = 10;
 
@@ -53,15 +54,6 @@ function ScheduleGrid({employees, sessions, onSessionsUpdated}){
     }
   }
 
-  function getEmployeeSessions(employeeId){
-    if(!sessions || !sessions.length)
-      return [];
-
-    return sessions.filter(session => {
-      return session.owner._id === employeeId || session.reviewer._id === employeeId;
-    });
-  }
-
   async function handleSetNewSession(session){
     try {
       await confirmPassword();
@@ -86,7 +78,7 @@ function ScheduleGrid({employees, sessions, onSessionsUpdated}){
 
         <div className="flex-1 grid h-full" style={{gap: "1px", gridTemplateColumns: `repeat(${hours * 4}, 1fr)`}}>
           {
-            getEmployeeSessions(allEmployee._id).map((session, index) => {
+            getEmployeeSessions(sessions, allEmployee._id).map((session, index) => {
               return (
                 <SessionTile 
                   key={index}
@@ -127,7 +119,7 @@ function ScheduleGrid({employees, sessions, onSessionsUpdated}){
 
               <div className="absolute inset-0 grid pointer-events-none" style={{background: "rgba(0, 0, 0, 0.01)", gap: "1px", gridTemplateColumns: `repeat(${hours * 4}, 1fr)`}}>
                 {
-                  getEmployeeSessions(e._id).map((session, index) => {
+                  getEmployeeSessions(sessions, e._id).map((session, index) => {
                     return (
                       <SessionTile 
                         key={index} 
@@ -147,7 +139,7 @@ function ScheduleGrid({employees, sessions, onSessionsUpdated}){
         { selectedUser && (
             <SingleEmployeeSchedule 
               employee={selectedUser}
-              sessions={getEmployeeSessions(selectedUser._id)}
+              sessions={getEmployeeSessions(sessions, selectedUser._id)}
               onClose={_ => setSelectedUser(null)}
             />
           )
@@ -184,18 +176,19 @@ function ScheduleGrid({employees, sessions, onSessionsUpdated}){
 
 function App() {
   const {isLoading, error, data} = useQuery('employeeList', () =>
-    fetch('https://walterkimaro.com/api/Employee').then(res =>
+    fetch(`${BASE_URL}/Employee`).then(res =>
       res.json()
     )
   );
 
   const sessions = useQuery('sessions', () =>
-    fetch('https://walterkimaro.com/api/Session').then(res =>
+    fetch(`${BASE_URL}/Session`).then(res =>
       res.json()
     )
   );
 
-  if (isLoading || sessions.isLoading) return 'Loading...';
+  if (isLoading || sessions.isLoading)
+    return <div className="bg-gradient-to-br from-blue-900 to-purple-500 text-white h-screen flex items-center justify-center text-lg tracking-wider">LOADING...</div>;
 
   return (
     <div>

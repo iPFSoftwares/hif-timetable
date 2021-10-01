@@ -1,5 +1,5 @@
-import { defaultActivity } from "./constants";
-import { addMinutesToTime, formatLink, getTimeFromNumber } from "./utils";
+import { defaultActivity } from "../constants";
+import { addMinutesToTime, formatLink, getTimeFromNumber } from "../utils";
 
 function SingleEmployeeSchedule({ employee, sessions, onClose }) {
     const sortedSessions = sessions.sort((a, b) => a.time - b.time);

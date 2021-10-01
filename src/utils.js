@@ -65,3 +65,12 @@ export async function confirmPassword(){
         }
     });
 }
+
+export function getEmployeeSessions(sessions, employeeId){
+    if(!sessions || !sessions.length)
+      return [];
+
+    return sessions.filter(session => {
+      return session.owner._id === employeeId || session.reviewer._id === employeeId;
+    });
+}

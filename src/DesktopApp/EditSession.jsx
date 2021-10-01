@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { addMinutesToTime, getNumberFromTimeArray, getTimeFromNumber, numberTimeDiff } from "./utils";
-import { defaultActivity } from "./constants";
+import { addMinutesToTime, getNumberFromTimeArray, getTimeFromNumber, numberTimeDiff } from "../utils";
 import SearchEmployees from "./SearchEmployees";
-import ActivityPicker from "./ActivityPicker";
 import { useMutation } from "react-query";
+import ActivityPicker from "./ActivityPicker";
+import { defaultActivity, BASE_URL } from "../constants";
 
 const hourChoices = [8,9,10,11,12,13,14,15,16, 17,18];
 const minuteChoices = [0, 15, 30, 45];
@@ -35,26 +35,25 @@ function EmployeePicker({employee, onChange}){
     );
 }
 
-function AddSession({ session, onClose, onSave }) {
-    const duration = session.duration || 60;
-    const [employee, setEmployee] = useState(session.employee);
-    const [reviewer, setReviewer] = useState(session.employee);
-    const [startTime, setStartTime] = useState(session.startTime.split(":").map(digit => Number(digit)));
+function EditSession({ session, onClose, onSave }) {
+    const duration = session.duration;
+    const [employee, setEmployee] = useState(session.owner);
+    const [reviewer, setReviewer] = useState(session.reviewer);
+    const [startTime, setStartTime] = useState(getTimeFromNumber(session.time).split(":").map(digit => Number(digit)));
     const [endTime, setEndTime] = useState([8,30]);
-    const [description, setDescription] = useState("");
-    const [activity, setActivity] = useState(null);
-    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState(session.description);
+    const [activity, setActivity] = useState(session.activity && session.activity._id !== "a535186e-5e34-4bc1-872f-d06d7b604613" ? session.activity : null);
+    const [title, setTitle] = useState(session.title);
 
     const mutation = useMutation((updatedUser) =>
-        fetch('https://walterkimaro.com/api/Session', {
-            method: "POST",
+        fetch(`${BASE_URL}/Session/${session._id}`, {
+            method: "PATCH",
             body: JSON.stringify(updatedUser),
             headers: {
                 'Content-Type': 'application/json'
             },
-        }
-        ).then(res =>res.json()),
-        {
+        })
+        .then(res =>res.json()),{
             onSuccess: () => {
                 onSave();
             },
@@ -64,7 +63,8 @@ function AddSession({ session, onClose, onSave }) {
     const { isLoading, isError, error, isSuccess, data } = mutation;
 
     useEffect(() => {
-        setEndTime(addMinutesToTime(Number(session.startTime.replace(":", "")), duration).split(":").map(digit => Number(digit)));
+        const startTime = getTimeFromNumber(session.time).replace(":", "");
+        setEndTime(addMinutesToTime(Number(startTime), duration).split(":").map(digit => Number(digit)));
     }, []);
 
     function handleSave(){
@@ -96,7 +96,7 @@ function AddSession({ session, onClose, onSave }) {
                     <div className="absolute inset-0 bg-blue-900s bg-primary opacity-70"></div>
                     
                     <h3 className="font-semibold relative z-10">
-                        Add Session
+                        Edit Session
                     </h3>
 
                     <button className="relative z-10 p-1 hover:bg-white hover:bg-opacity-25 rounded-full" onClick={onClose}>
@@ -120,6 +120,7 @@ function AddSession({ session, onClose, onSave }) {
 
                         <ActivityPicker 
                             activity={activity}
+                            searchQuery={title}
                             onSearchQueryChange={setTitle}
                             onChange={setActivity} 
                         />
@@ -202,4 +203,4 @@ function AddSession({ session, onClose, onSave }) {
     );
 }
 
-export default AddSession;
+export default EditSession;

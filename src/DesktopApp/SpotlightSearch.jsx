@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useMutation } from "react-query";
+import { BASE_URL } from "../constants";
 
 import {
     Combobox,
@@ -33,7 +33,7 @@ function fetchCities(value) {
   if (cache[value]) {
     return Promise.resolve(cache[value]);
   }
-  return fetch("https://walterkimaro.com/api/Employee/search?q=" + value)
+  return fetch(`${BASE_URL}/Employee/search?q=${value}`)
     .then((res) => res.json())
     .then((result) => {
       cache[value] = result;

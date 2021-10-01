@@ -6,6 +6,7 @@ import {
     ComboboxOption
 } from "@reach/combobox";
 import { useEffect, useState } from "react";
+import { BASE_URL } from "../constants";
 
 function useCitySearch(searchTerm) {
   const [cities, setCities] = useState([]);
@@ -31,7 +32,7 @@ function fetchCities(value) {
   if (cache[value]) {
     return Promise.resolve(cache[value]);
   }
-  return fetch("https://walterkimaro.com/api/SessionType/search?q=" + value)
+  return fetch(`${BASE_URL}/SessionType/search?q=${value}`)
     .then((res) => res.json())
     .then((result) => {
       cache[value] = result;
