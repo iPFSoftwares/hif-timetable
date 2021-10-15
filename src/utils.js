@@ -41,6 +41,7 @@ export const getTimeFromRow = (row) => {
 }
 
 export function formatLink(content){
+    if(!content || !content.length) return "";
     const exp_match = /(\b(https?|):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
     const element_content=content.replace(exp_match, `<a class="text-blue-900" target="_blank" href='$1'>$1</a>`);
     const new_exp_match =/(^|[^\/])(www\.[\S]+(\b|$))/gim;
