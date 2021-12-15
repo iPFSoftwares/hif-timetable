@@ -1,0 +1,128 @@
+[
+    {
+        "_id": "11684c62-c5ea-4b36-a649-1a0bbb21ee8d",
+        "name": "Client",
+        "display_field": "name",
+        "fields": [
+            {
+                "label": "name",
+                "type": "name",
+                "required": true
+            },
+            {
+                "label": "email",
+                "type": "email",
+                "required": true
+            },
+            {
+                "label": "organisation",
+                "type": "string",
+                "required": true
+            }
+        ],
+        "settings": {
+            "listPageType": "table"
+        },
+        "created_at": "2021-01-02T23:29:46.000000Z",
+        "updated_at": "2021-01-02T23:29:46.000000Z"
+    },
+    {
+        "_id": "750e50be-5417-4cf6-aae2-981ec7d060b7",
+        "name": "Message",
+        "display_field": "body",
+        "fields": "[{\"label\":\"body\",\"type\":\"long text\",\"required\":true,\"meta\":{\"wysiwyg\":false}},{\"label\":\"media\",\"type\":\"reference\",\"required\":true,\"meta\":{\"model\":\"Project Media\",\"field\":\"url\",\"type\":\"file\"}},{\"label\":\"sender\",\"type\":\"reference\",\"required\":true,\"meta\":{\"model\":\"Employee\",\"field\":\"dp\",\"type\":\"image\",\"face\":true}},{\"label\":\"project\",\"type\":\"reference\",\"required\":true,\"meta\":{\"model\":\"Project\",\"field\":\"name\",\"type\":\"string\"}}]",
+        "settings": "{\"listPageType\": \"table\"}",
+        "created_at": "2021-03-31T09:21:57.000000Z",
+        "updated_at": "2021-03-31T09:21:57.000000Z"
+    },
+    {
+        "_id": "7b0e27db-b3f4-4af7-ba67-dba3f4c27cd3",
+        "name": "Fancy Maps Subscriptions",
+        "display_field": "email",
+        "fields": "[{\"label\":\"plan_id\",\"type\":\"string\",\"required\":false},{\"label\":\"email\",\"type\":\"email\",\"required\":true},{\"label\":\"subscription_id\",\"type\":\"string\",\"required\":true},{\"label\":\"receipt_number\",\"type\":\"string\",\"required\":false},{\"label\":\"end_date\",\"type\":\"date\",\"required\":false,\"meta\":{\"includeTime\":false}},{\"label\":\"cancel_link\",\"type\":\"link\",\"required\":false},{\"label\":\"update_link\",\"type\":\"link\",\"required\":true},{\"label\":\"status\",\"type\":\"string\",\"required\":false},{\"label\":\"transaction\",\"type\":\"long text\",\"required\":false,\"meta\":{\"wysiwyg\":false}}]",
+        "settings": "{\"listPageType\": \"table\"}",
+        "created_at": "2021-04-14T17:19:42.000000Z",
+        "updated_at": "2021-05-13T08:31:39.000000Z"
+    },
+    {
+        "_id": "7dfdb385-5ffa-4e9e-8723-78ea44bcf9fa",
+        "name": "Project Story",
+        "display_field": "body",
+        "fields": "[{\"label\":\"body\",\"type\":\"long text\",\"required\":true,\"meta\":{\"wysiwyg\":false}},{\"label\":\"description\",\"type\":\"long text\",\"required\":true,\"meta\":{\"wysiwyg\":true}},{\"label\":\"type\",\"type\":\"status\",\"required\":true,\"meta\":{\"availableStatuses\":[{\"name\":\"Feature\",\"color\":\"#ff9800\"},{\"name\":\"Bug\",\"color\":\"#f44336\"},{\"name\":\"Chore\",\"color\":\"#607d8b\"}]}},{\"label\":\"points\",\"type\":\"number\",\"required\":true},{\"label\":\"status\",\"type\":\"status\",\"required\":true,\"meta\":{\"availableStatuses\":[{\"name\":\"Pending\",\"color\":\"#607d8b\"},{\"name\":\"Picked\",\"color\":\"#9c27b0\"},{\"name\":\"Started\",\"color\":\"#ff9800\"},{\"name\":\"Finished\",\"color\":\"#2196f3\"},{\"name\":\"Tested\",\"color\":\"#009688\"},{\"name\":\"Approved\",\"color\":\"#4caf50\"},{\"name\":\"Rejected\",\"color\":\"#f44336\"}]}},{\"label\":\"requester\",\"type\":\"reference\",\"required\":true,\"meta\":{\"model\":\"Employee\",\"field\":\"dp\",\"type\":\"image\",\"face\":true}},{\"label\":\"owners\",\"type\":\"multi-reference\",\"required\":true,\"meta\":{\"model\":\"Employee\",\"field\":\"dp\",\"type\":\"image\",\"face\":true}},{\"label\":\"project\",\"type\":\"reference\",\"required\":true,\"meta\":{\"model\":\"Project\",\"field\":\"name\",\"type\":\"string\"}}]",
+        "settings": "{\"listPageType\": \"table\"}",
+        "created_at": "2021-03-31T14:04:03.000000Z",
+        "updated_at": "2021-03-31T14:04:03.000000Z"
+    },
+    {
+        "_id": "8b5a79e4-16e1-4639-97a7-4e1ed4fbbcce",
+        "name": "Thread",
+        "display_field": "name",
+        "fields": "[{\"label\":\"name\",\"type\":\"string\",\"required\":true},{\"label\":\"project\",\"type\":\"reference\",\"required\":true,\"meta\":{\"model\":\"Project\",\"field\":\"name\",\"type\":\"string\"}}]",
+        "settings": "{\"listPageType\": \"table\"}",
+        "created_at": "2021-01-03T10:20:58.000000Z",
+        "updated_at": "2021-01-03T10:20:58.000000Z"
+    },
+    {
+        "_id": "958a3a4f-67d0-4bc6-9e16-85b7478b1f4a",
+        "name": "Employee",
+        "display_field": "full_name",
+        "fields": "[{\"label\":\"dp\",\"type\":\"image\",\"required\":true,\"meta\":{\"face\":true}},{\"label\":\"full_name\",\"type\":\"name\",\"required\":true},{\"label\":\"tin_number\",\"type\":\"string\",\"required\":false},{\"label\":\"email\",\"type\":\"email\",\"required\":true},{\"label\":\"dob\",\"type\":\"date\",\"required\":true,\"meta\":{\"includeTime\":false}},{\"label\":\"team\",\"type\":\"status\",\"required\":false,\"meta\":{\"availableStatuses\":[{\"name\":\"frontend\",\"color\":\"#ff9800\"},{\"name\":\"backend\",\"color\":\"#4caf50\"},{\"name\":\"management\",\"color\":\"#9c27b0\"},{\"name\":\"finance\",\"color\":\"#2196f3\"}]}},{\"label\":\"github_profile\",\"type\":\"link\",\"required\":false},{\"label\":\"twitter_profile\",\"type\":\"link\",\"required\":true},{\"label\":\"employee_id\",\"type\":\"string\",\"required\":true}]",
+        "settings": "{\"listPageCard\": {\"card\": \"ProfileCard\", \"bindings\": {\"name\": \"full_name\", \"image\": \"dp\", \"status\": \"team\", \"twitter\": \"twitter_profile\", \"instagram\": \"github_profile\"}}, \"listPageType\": \"table\"}",
+        "created_at": "2021-01-02T23:24:12.000000Z",
+        "updated_at": "2021-09-17T07:41:57.000000Z"
+    },
+    {
+        "_id": "9ca5d9bd-2566-48c0-8ed7-30d74616ee81",
+        "name": "Session",
+        "display_field": "activity",
+        "fields": "[{\"label\":\"time\",\"type\":\"number\",\"required\":true},{\"label\":\"duration\",\"type\":\"number\",\"required\":true},{\"label\":\"activity\",\"type\":\"reference\",\"required\":true,\"meta\":{\"model\":\"Session Type\",\"field\":\"title\",\"type\":\"string\"}},{\"label\":\"title\",\"type\":\"string\",\"required\":true},{\"label\":\"description\",\"type\":\"long text\",\"required\":false,\"meta\":{\"wysiwyg\":false}},{\"label\":\"owner\",\"type\":\"reference\",\"required\":true,\"meta\":{\"model\":\"Employee\",\"field\":\"dp\",\"type\":\"image\",\"face\":true}},{\"label\":\"reviewer\",\"type\":\"reference\",\"required\":true,\"meta\":{\"model\":\"Employee\",\"field\":\"dp\",\"type\":\"image\",\"face\":true}},{\"label\":\"collaborators\",\"type\":\"multi-reference\",\"required\":true,\"meta\":{\"model\":\"Employee\",\"field\":\"dp\",\"type\":\"image\",\"face\":true}}]",
+        "settings": "{\"listPageType\": \"table\"}",
+        "created_at": "2021-09-22T09:26:17.000000Z",
+        "updated_at": "2021-11-18T11:40:08.000000Z"
+    },
+    {
+        "_id": "a38ff59f-1f87-4acd-9357-a8b23733f6ba",
+        "name": "Project Media",
+        "display_field": "name",
+        "fields": "[{\"label\":\"name\",\"type\":\"string\",\"required\":true},{\"label\":\"type\",\"type\":\"string\",\"required\":true},{\"label\":\"url\",\"type\":\"file\",\"required\":true},{\"label\":\"project\",\"type\":\"reference\",\"required\":true,\"meta\":{\"model\":\"Project\",\"field\":\"name\",\"type\":\"string\"}}]",
+        "settings": "{\"listPageType\": \"table\"}",
+        "created_at": "2021-03-31T09:14:06.000000Z",
+        "updated_at": "2021-03-31T09:14:06.000000Z"
+    },
+    {
+        "_id": "a644f5c2-8b75-4551-8d5e-4a84dd169d9d",
+        "name": "Session Type",
+        "display_field": "title",
+        "fields": "[{\"label\":\"title\",\"type\":\"string\",\"required\":true}]",
+        "settings": "{\"listPageType\": \"table\"}",
+        "created_at": "2021-09-22T09:15:01.000000Z",
+        "updated_at": "2021-09-22T09:15:01.000000Z"
+    },
+    {
+        "_id": "ac8c2440-6d5d-4e71-969b-d3c3ac61f7b1",
+        "name": "Project",
+        "display_field": "name",
+        "fields": "[{\"label\":\"name\",\"type\":\"string\",\"required\":true},{\"label\":\"start_date\",\"type\":\"date\",\"required\":true,\"meta\":{\"includeTime\":false}},{\"label\":\"end_date\",\"type\":\"date\",\"required\":false,\"meta\":{\"includeTime\":false}},{\"label\":\"github_repo\",\"type\":\"link\",\"required\":false},{\"label\":\"pivotal_project_id\",\"type\":\"string\",\"required\":false},{\"label\":\"sprint_duration\",\"type\":\"number\",\"required\":false},{\"label\":\"client\",\"type\":\"reference\",\"required\":false,\"meta\":{\"model\":\"Client\",\"field\":\"name\",\"type\":\"name\"}}]",
+        "settings": "{\"listPageType\": \"table\"}",
+        "created_at": "2021-01-03T10:12:30.000000Z",
+        "updated_at": "2021-01-03T10:12:30.000000Z"
+    },
+    {
+        "_id": "ea301d17-6592-4e70-83b9-fb910f635205",
+        "name": "Task",
+        "display_field": "title",
+        "fields": "[{\"label\":\"title\",\"type\":\"string\",\"required\":true},{\"label\":\"description\",\"type\":\"long text\",\"required\":true,\"meta\":{\"wysiwyg\":false}},{\"label\":\"assignees\",\"type\":\"multi-reference\",\"required\":true,\"meta\":{\"model\":\"Employee\",\"field\":\"dp\",\"type\":\"image\",\"face\":true}},{\"label\":\"story\",\"type\":\"reference\",\"required\":true,\"meta\":{\"model\":\"Project Story\",\"field\":\"body\",\"type\":\"long text\",\"wysiwyg\":false}}]",
+        "settings": "{\"listPageType\": \"table\"}",
+        "created_at": "2021-05-05T16:22:21.000000Z",
+        "updated_at": "2021-05-05T16:22:21.000000Z"
+    },
+    {
+        "_id": "f77b9e7a-d381-40d3-b805-d742e499c14d",
+        "name": "Project Member",
+        "display_field": "member",
+        "fields": "[{\"label\":\"project\",\"type\":\"reference\",\"required\":true,\"meta\":{\"model\":\"Project\",\"field\":\"name\",\"type\":\"string\"}},{\"label\":\"member\",\"type\":\"reference\",\"required\":true,\"meta\":{\"model\":\"Employee\",\"field\":\"dp\",\"type\":\"image\",\"face\":true}},{\"label\":\"role\",\"type\":\"string\",\"required\":true},{\"label\":\"sprint_hours\",\"type\":\"number\",\"required\":true}]",
+        "settings": "{\"listPageType\": \"table\"}",
+        "created_at": "2021-01-03T10:14:14.000000Z",
+        "updated_at": "2021-01-03T10:14:14.000000Z"
+    }
+]
